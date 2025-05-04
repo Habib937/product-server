@@ -9,8 +9,6 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.c3mzl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set  Stable API version
@@ -33,15 +31,8 @@ async function run() {
     const reportcollection = client.db("tech-hub").collection("reports");
     const acceptcollection = client.db("tech-hub").collection("accept-product");
 
-
-
-
-
-   
-
     // jwt api
-
-    app.post("/jwt", async (req, res) => {
+  app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "10h",
@@ -50,7 +41,6 @@ async function run() {
     });
 
     // middleware 
-
     const verifytoken = (req,res,next) => {
         console.log('inside',req.headers.authorization)
         if(!req.headers.authorization){
@@ -64,11 +54,9 @@ async function run() {
           req.decoded = decoded;
           next()
         })
-        // next()
       }
   
-  
-      const verifyadmin = async (req,res,next) => {
+        const verifyadmin = async (req,res,next) => {
         const email = req.decoded.email;
         const query = {email: email};
         const user = await usercollection.findOne(query);
