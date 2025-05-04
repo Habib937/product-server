@@ -67,7 +67,6 @@ async function run() {
         next()
       }
 
-
        // accept product 
 
     app.post("/accept-product", async (req, res) => {
@@ -116,7 +115,6 @@ async function run() {
     app.post("/tech", async (req, res) => {
       const item = req.body;
       item.timestamp = new Date();
-
       const result = await techcollection.insertOne(item);
       res.send(result);
     });
@@ -125,8 +123,6 @@ async function run() {
       const result = await techcollection.find().sort({ timestamp: -1 }).toArray();
       res.send(result);
     });
-
-   
 
     app.get('/tech/:id', async (req, res) => {
       const id = req.params.id;
@@ -146,8 +142,7 @@ async function run() {
         // Handle case where the document is not found
         if (!result) {
           return res.status(404).send({ message: 'Document not found' });
-        }
-    
+        }    
         res.status(200).send(result);
       } catch (error) {
         console.error('Error fetching document:', error);
@@ -155,25 +150,20 @@ async function run() {
       }
     });
 
-
     app.delete('/tech/:id', async(req,res)=> {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const result = await techcollection.deleteOne(query)
       res.send(result)
     })
-
-
     app.put("/tech/:id", async (req, res) => {
       const { id } = req.params;
       const updatedData = req.body;
-    
       try {
         const result = await techcollection.updateOne(
           { _id: new ObjectId(id) },
           { $set: updatedData }
         );
-    
         if (result.modifiedCount > 0) {
           res.status(200).json({ message: "Product updated successfully" });
         } else {
@@ -185,11 +175,7 @@ async function run() {
       }
     });
 
-
-
     // report api 
-
-
     app.post("/reports", async (req, res) => {
       try {
         const { productId, reportedBy,productName ,image,votes,tags} = req.body;
@@ -197,13 +183,11 @@ async function run() {
         if (!productId || !reportedBy) {
           return res.status(400).json({ message: "Product ID and Reporter are required." });
         }
-    
         // Check if the product is already reported
         const existingReport = await reportcollection.findOne({ productId });
         if (existingReport) {
           return res.status(400).json({ message: "This product has already been reported." });
         }
-    
         // Add the report to the database
         const report = {
           productId,
@@ -228,20 +212,15 @@ async function run() {
       }
     });
     
-
     app.get('/reports', async (req,res) => {
       const result = await reportcollection.find().toArray()
       res.send(result)
     })
-
-
     app.delete("/reports/:id", async (req, res) => {
       const { id } = req.params;
-    
       try {
         // Delete the product from techcollection
         const techResult = await techcollection.deleteOne({ _id: new ObjectId(id) });
-    
         // Delete the product from reportcollection
         const reportResult = await reportcollection.deleteOne({ productId: id });
     
