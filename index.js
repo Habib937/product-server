@@ -238,15 +238,10 @@ async function run() {
         res.status(500).json({ message: "Failed to delete product", error });
       }
     });
-
-    
-
   //  review 
-   
     app.post("/reviews", async (req, res) => {
       const item = req.body;
       item.timestamp = new Date();
-
       const result = await reviewcollection.insertOne(item);
       res.send(result);
     });
@@ -255,11 +250,8 @@ async function run() {
       const result = await reviewcollection.find().sort({ timestamp: -1 }).toArray();
       res.send(result);
     });
-
-
     app.get('/reviews/:proid', async (req, res) => {
       const { proid } = req.params;
-    
       try {
         // Validate proid as a valid ObjectId
         if (!ObjectId.isValid(proid)) {
@@ -269,34 +261,23 @@ async function run() {
         // Query to filter reviews by proid
         const query = { proid: proid };
         const reviews = await reviewcollection.find(query).toArray();
-    
         // If no reviews are found
         if (reviews.length === 0) {
           return res.status(404).send({ message: 'No reviews found for this product' });
         }
-    
         res.status(200).send(reviews);
       } catch (error) {
         console.error('Error fetching reviews:', error);
         res.status(500).send({ message: 'Internal server error', error });
       }
     });
-    
-    
-    
-
     // vote apis
-
-    
-
     app.post("/accept-product/:id/upvote", async (req, res) => {
       const { id } = req.params;
       const { userId } = req.body;
-    
       if (!id || !userId) {
         return res.status(400).json({ message: "Product ID or User ID is missing" });
       }
-    
       const product = await acceptcollection.findOne({ _id: new ObjectId(id) });
     
       if (!product) {
@@ -318,36 +299,27 @@ async function run() {
         res.status(500).json({ message: "Failed to update vote" });
       }
     });
-    
-
-
     // user api
-
     app.delete('/users/:id', async (req,res)=>{
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
       const result = await usercollection.deleteOne(query)
       res.send(result)
     })
-
     app.post("/users", async (req, res) => {
       const user = req.body;
-
       const query = { email: user.email };
       const existuser = await usercollection.findOne(query);
       if (existuser) {
         return res.send({ message: "user already exist", insertedId: null });
       }
-
       const result = await usercollection.insertOne(user);
       res.send(result);
     });
-
     app.get("/users",verifytoken, async (req, res) => {
       const result = await usercollection.find().toArray();
       res.send(result);
     });
-
     app.patch('/users/admin/:id', verifytoken ,async (req,res) => {
         const id = req.params.id;
         const filter = {_id: new ObjectId(id)};
@@ -359,13 +331,11 @@ async function run() {
         const result = await usercollection.updateOne(filter, updatedDoc)
         res.send(result)
       })
-
       app.get('/users/admin/:email', verifytoken,  async (req,res) => {
         const email = req.params.email;
         if ( email !== req.decoded.email){
           return res.status(403).send({message: 'unauthorized access'})
         }
-
         const query = {email: email}
         const user = await usercollection.findOne(query)
         let admin = false;
@@ -374,7 +344,6 @@ async function run() {
         }
         res.send({admin})
       })
-
       app.patch('/users/moderator/:id', verifytoken ,async (req,res) => {
         const id = req.params.id;
         const filter = {_id: new ObjectId(id)};
@@ -386,13 +355,11 @@ async function run() {
         const result = await usercollection.updateOne(filter, updatedDoc)
         res.send(result)
       })
-
       app.get('/users/moderator/:email', verifytoken,  async (req,res) => {
         const email = req.params.email;
         if ( email !== req.decoded.email){
           return res.status(403).send({message: 'unauthorized access'})
         }
-
         const query = {email: email}
         const user = await usercollection.findOne(query)
         let moderator = false;
@@ -401,8 +368,6 @@ async function run() {
         }
         res.send({moderator})
       })
-
-
       app.get('/admin-stats', async (req, res) => {
         try {
           const users = await usercollection.estimatedDocumentCount();
@@ -418,7 +383,7 @@ async function run() {
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     // console.log(
-    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // "Pinged your deployment. You successfully connected to MongoDB!"
     // );
   } finally {
 
@@ -427,7 +392,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
 app.get("/", (req, res) => {
   res.send("tech is running");
 });
